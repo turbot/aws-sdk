@@ -138,7 +138,7 @@ const initialize = function() {
   const servicePoints = { connect };
   const aws = require("aws-sdk");
   for (const k of Object.keys(aws)) {
-    servicePoints[k] = function() {
+    servicePoints[k.toLowerCase()] = function() {
       return connect(k, ...arguments);
     };
   }
