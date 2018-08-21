@@ -1,0 +1,55 @@
+{
+  "name": "@turbot/aws-sdk",
+  "author": "Turbot HQ, Inc",
+  "version": "4.0.0-alpha.1",
+  "private": true,
+  "main": "index.js",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "scripts": {
+    "test": "npx nyc npx mocha"
+  },
+  "eslintConfig": {
+    "extends": [
+      "plugin:prettier/recommended",
+      "eslint:recommended",
+      "plugin:you-dont-need-lodash-underscore/compatible"
+    ],
+    "env": {
+      "es6": true,
+      "node": true,
+      "mocha": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 8
+    },
+    "rules": {
+      "no-console": "off"
+    }
+  },
+  "prettier": {
+    "printWidth": 120
+  },
+  "dependencies": {
+    "@turbot/config": "git+ssh://git@github.com:turbotio/config.git",
+    "@turbot/errors": "git+ssh://git@github.com:turbotio/errors.git",
+    "@turbot/log": "git+ssh://git@github.com:turbotio/log.git",
+    "@turbot/xray": "git+ssh://git@github.com:turbotio/xray.git",
+    "aws-sdk": "2.211.0",
+    "lodash": "4.17.5",
+    "micromatch": "3.1.9",
+    "proxy-agent": "2.2.0"
+  },
+  "devDependencies": {
+    "chai": "4.1.2",
+    "eslint": "4.18.2",
+    "eslint-config-prettier": "2.9.0",
+    "eslint-plugin-prettier": "2.6.0",
+    "eslint-plugin-you-dont-need-lodash-underscore": "^6.3.1",
+    "mocha": "5.2.0",
+    "nyc": "11.8.0",
+    "prettier": "1.11.1",
+    "test-console": "1.1.0"
+  }
+}
