@@ -156,6 +156,15 @@ const connect = function(serviceKey, params, opts = {}) {
   return new aws[serviceKey](params);
 };
 
-module.exports = {
-  connect
+const initialize = function() {
+  const servicePoints = { connect };
+  const aws = require("aws-sdk");
+  for (const k of Object.keys(aws)) {
+    servicePoints[k.toLowerCase()] = function() {
+      return connect(k, ...arguments);
+    };
+  }
+  return servicePoints;
 };
+
+module.exports = initialize();
