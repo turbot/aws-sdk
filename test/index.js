@@ -2,13 +2,12 @@ const _ = require("lodash");
 const assert = require("chai").assert;
 const testConsole = require("test-console");
 const taws = require("..");
-const tconf = require("@turbot/config");
 
 describe("@turbot/aws-sdk", function() {
   describe("Default base case", function() {
     var conn;
     before(function() {
-      conn = taws.SSM();
+      conn = taws.connect("SSM");
     });
     it("uses signature v4", function() {
       assert.equal(conn.config.signatureVersion, "v4");
@@ -22,7 +21,7 @@ describe("@turbot/aws-sdk", function() {
   describe("signatureVersion override", function() {
     var conn;
     before(function() {
-      conn = taws.SSM({
+      conn = taws.connect("SSM", {
         signatureVersion: "v3"
       });
     });
@@ -39,7 +38,7 @@ describe("@turbot/aws-sdk", function() {
     });
 
     after(function() {
-      for (k in tmpEnv) {
+      for (let k in tmpEnv) {
         if (tmpEnv[k]) {
           process.env[k] = tmpEnv[k];
         } else {
@@ -53,7 +52,7 @@ describe("@turbot/aws-sdk", function() {
       const region = "ap-northeast-1";
       before(function() {
         process.env.AWS_REGION = region;
-        conn = taws.SSM();
+        conn = taws.connect("SSM");
       });
       it("as expected", function() {
         assert.equal(conn.config.region, region);
@@ -65,8 +64,7 @@ describe("@turbot/aws-sdk", function() {
       const region = "ap-northeast-2";
       before(function() {
         process.env.TURBOT_CONFIG_ENV = JSON.stringify({ env: { region: region } });
-        tconf.$load();
-        conn = taws.SSM();
+        conn = taws.connect("SSM");
       });
       it("as expected", function() {
         assert.equal(conn.config.region, region);
@@ -77,7 +75,7 @@ describe("@turbot/aws-sdk", function() {
       var conn;
       const region = "ap-northeast-3";
       before(function() {
-        conn = taws.SSM({
+        conn = taws.connect("SSM", {
           region: region
         });
       });
@@ -95,14 +93,13 @@ describe("@turbot/aws-sdk", function() {
     });
 
     after(function() {
-      for (k in tmpEnv) {
+      for (let k in tmpEnv) {
         if (tmpEnv[k]) {
           process.env[k] = tmpEnv[k];
         } else {
           delete process.env[k];
         }
       }
-      tconf.$load();
     });
 
     describe("https_proxy URL only", function() {
@@ -112,8 +109,7 @@ describe("@turbot/aws-sdk", function() {
       };
       before(function() {
         process.env.TURBOT_CONFIG_ENV = JSON.stringify(proxy);
-        tconf.$load();
-        conn = taws.SSM();
+        conn = taws.connect("SSM");
       });
       it("has proxy agent with correct host", function() {
         assert.exists(conn.config.httpOptions.agent);
@@ -130,9 +126,8 @@ describe("@turbot/aws-sdk", function() {
       };
       before(function() {
         process.env.TURBOT_CONFIG_ENV = JSON.stringify(proxy);
-        tconf.$load();
         logLines = testConsole.stdout.inspectSync(function() {
-          conn = taws.SSM();
+          conn = taws.connect("SSM");
         });
         logLine = JSON.parse(logLines[0]);
       });

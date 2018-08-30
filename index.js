@@ -4,7 +4,6 @@ const localstackServices = require("./localstack-services");
 const log = require("@turbot/log");
 const micromatch = require("micromatch");
 const pa = require("proxy-agent");
-const tconf = require("@turbot/config");
 const { URL } = require("url");
 
 // AWS SDK requires the use of proxy-agent. Unfortunately it's very limited
@@ -24,8 +23,15 @@ const { URL } = require("url");
 //   aws.https_proxy = process.env.https_proxy || process.env.HTTPS_PROXY
 //   aws.proxy.enabled = ['*']
 //   aws.proxy.disabled = []
-const proxyAgent = function(serviceKey) {
-  const awsProxy = _.cloneDeep(tconf.get(["aws", "proxy"], {}));
+
+const proxyAgent = function(serviceKey, turbotConfig) {
+  let awsProxy = _.get(turbotConfig, "aws.proxy");
+  if (awsProxy) {
+    awsProxy = _.cloneDeep(awsProxy);
+  } else {
+    awsProxy = {};
+  }
+
   _.defaults(awsProxy, {
     https_proxy: process.env.https_proxy || process.env.HTTPS_PROXY,
     enabled: ["*"],
@@ -65,7 +71,7 @@ const proxyAgent = function(serviceKey) {
     // AWS to fail at scale, leaving Turbot inoperable.
     // Instead, log the error and continue with no proxy. That may not work
     // either, but is better than a bad configuration locking us out completely.
-    log.error(errors.badConfiguration("Invalid URL configuration in aws.proxy.https_proxy", e));
+    log.error(errors.badConfiguration("Invalid URL configuration in aws.proxy.https_proxy", { error: e }));
     return null;
   }
   return pa(proxyObj.href);
@@ -79,52 +85,68 @@ const localEndpoint = function(serviceKey) {
 };
 
 const connect = function(serviceKey, params, opts = {}) {
+  // Parse env variable ourselves because we have issues with @turbot/config + npm + git
+  // npm believe each @turbot/config is a separate version and therefore it's loaded multiple times
+  let turbotConfig = {};
+  if (process.env.TURBOT_CONFIG_ENV) {
+    try {
+      turbotConfig = JSON.parse(process.env.TURBOT_CONFIG_ENV);
+    } catch (e) {
+      log.error("Error setting proxy server for aws-sdk", e);
+      turbotConfig = {};
+    }
+  }
+
   let aws;
 
   if (process.env.TURBOT_TRACE === "true" || opts.trace) {
     const xray = require("@turbot/xray");
     aws = xray.captureAWS(require("aws-sdk"));
-
-    // This is not working as I had expected, no metadata is recorded
-
-    // if (opts.xrayMetadata) {
-    //   const segment = xray.getSegment();
-    //   Object.keys(opts.xrayMetadata).forEach(key => {
-    //     console.log(">>>>> adding XRay metadata: ", key, JSON.stringify(opts.xrayMetadata[key]));
-    //     segment.addMetadata(key, JSON.stringify(opts.xrayMetadata[key]));
-    //   });
-    // }
   } else {
     aws = require("aws-sdk");
   }
 
-  // Development hack
+  // Development or test setup to record VCR cassetttes
   if (process.env.NODE_ENV === "local-development") {
-    const credentials = new aws.SharedIniFileCredentials({ profile: process.env.TURBOT_DEV_PROFILE });
-    aws.config.credentials = credentials;
-    aws.config.region = process.env.TURBOT_DEV_MASTER_REGION;
+    if (process.env.TURBOT_DEV_PROFILE) {
+      const credentials = new aws.SharedIniFileCredentials({ profile: process.env.TURBOT_DEV_PROFILE });
+      aws.config.credentials = credentials;
+    }
+    if (process.env.TURBOT_DEV_MASTER_REGION) {
+      aws.config.region = process.env.TURBOT_DEV_MASTER_REGION;
+    }
+  }
+
+  // if (process.env.TURBOT_CURRENT_AWS_CREDENTIALS) {
+  //   console.log("Setting aws.config.credentials to ", process.env.TURBOT_CURRENT_AWS_CREDENTIALS);
+  //   aws.config.credentials = process.env.TURBOT_CURRENT_AWS_CREDENTIALS;
+  // }
+
+  // If running in Lambda setup, set the default region based on the:
+  // https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html
+  if (process.env.AWS_DEFAULT_REGION) {
+    aws.config.region = process.env.AWS_DEFAULT_REGION;
   }
 
   if (!params) params = {};
 
+  if (params.region) {
+    aws.config.region = params.region;
+  } else {
+    params.region = _.get(turbotConfig, "env.region");
+  }
+
   // If they have a proxy, configure the agent.
-  let proxy = proxyAgent(serviceKey);
+  let proxy = proxyAgent(serviceKey, turbotConfig);
   if (proxy) {
     params.httpOptions = {
       agent: proxy
     };
   }
-
   // If they have signalled test mode, then try connecting to a localstack
   // endpoint.
-  if (tconf.get(["aws", "test"])) {
+  if (process.env.TURBOT_TEST || _.get(turbotConfig, "aws.test")) {
     params.endpoint = localEndpoint(serviceKey);
-  }
-
-  if (!params.region) {
-    // env.region defaults to environment in turbot-config
-    // default to the AWS_REGION env var
-    params.region = tconf.get(["env", "region"], process.env.AWS_REGION);
   }
 
   // We always default to the best practice v4 unless otherwise specified.
@@ -134,15 +156,6 @@ const connect = function(serviceKey, params, opts = {}) {
   return new aws[serviceKey](params);
 };
 
-const initialize = function() {
-  const servicePoints = { connect };
-  const aws = require("aws-sdk");
-  for (const k of Object.keys(aws)) {
-    servicePoints[k.toLowerCase()] = function() {
-      return connect(k, ...arguments);
-    };
-  }
-  return servicePoints;
+module.exports = {
+  connect
 };
-
-module.exports = initialize();

@@ -8,7 +8,8 @@
     "node": ">=6.0.0"
   },
   "scripts": {
-    "test": "npx nyc npx mocha"
+    "test": "nyc mocha",
+    "fast-test": "mocha"
   },
   "eslintConfig": {
     "extends": [
@@ -32,7 +33,6 @@
     "printWidth": 120
   },
   "dependencies": {
-    "@turbot/config": "git+ssh://git@github.com:turbotio/config.git",
     "@turbot/errors": "git+ssh://git@github.com:turbotio/errors.git",
     "@turbot/log": "git+ssh://git@github.com:turbotio/log.git",
     "@turbot/xray": "git+ssh://git@github.com:turbotio/xray.git",
