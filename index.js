@@ -117,23 +117,25 @@ const connect = function(serviceKey, params, opts = {}) {
     }
   }
 
-  // if (process.env.TURBOT_CURRENT_AWS_CREDENTIALS) {
-  //   console.log("Setting aws.config.credentials to ", process.env.TURBOT_CURRENT_AWS_CREDENTIALS);
-  //   aws.config.credentials = process.env.TURBOT_CURRENT_AWS_CREDENTIALS;
-  // }
+  if (!params) params = {};
+
+  if (process.env.TURBOT_CONTROL_AWS_CREDENTIALS) {
+    const creds = JSON.parse(process.env.TURBOT_CONTROL_AWS_CREDENTIALS);
+    log.debug("Setting params.credentials to", { credentials: creds });
+    params.credentials = creds;
+  }
 
   // If running in Lambda setup, set the default region based on the:
   // https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html
-  if (process.env.AWS_DEFAULT_REGION) {
-    aws.config.region = process.env.AWS_DEFAULT_REGION;
-  }
-
-  if (!params) params = {};
-
-  if (params.region) {
-    aws.config.region = params.region;
-  } else {
-    params.region = _.get(turbotConfig, "env.region");
+  // AWS_DEFAULT_REGION is the first preference
+  if (!params.region) {
+    params.region = process.env.AWS_DEFAULT_REGION;
+    if (!params.region) {
+      params.region = process.env.TURBOT_CONTROL_AWS_REGION;
+      if (!params.region) {
+        params.region = _.get(turbotConfig, "env.region");
+      }
+    }
   }
 
   // If they have a proxy, configure the agent.
@@ -143,6 +145,7 @@ const connect = function(serviceKey, params, opts = {}) {
       agent: proxy
     };
   }
+
   // If they have signalled test mode, then try connecting to a localstack
   // endpoint.
   if (process.env.TURBOT_TEST || _.get(turbotConfig, "aws.test")) {
@@ -153,18 +156,24 @@ const connect = function(serviceKey, params, opts = {}) {
   if (!params.signatureVersion) {
     params.signatureVersion = "v4";
   }
+
+  log.debug("Instantiating service", { serviceKey: serviceKey, params: params });
   return new aws[serviceKey](params);
 };
 
-const initialize = function() {
-  const servicePoints = { connect };
-  const aws = require("aws-sdk");
-  for (const k of Object.keys(aws)) {
-    servicePoints[k.toLowerCase()] = function() {
-      return connect(k, ...arguments);
-    };
-  }
-  return servicePoints;
+module.exports = {
+  connect
 };
 
-module.exports = initialize();
+// const initialize = function() {
+//   const servicePoints = { connect };
+//   const aws = require("aws-sdk");
+//   for (const k of Object.keys(aws)) {
+//     servicePoints[k.toLowerCase()] = function() {
+//       return connect(k, ...arguments);
+//     };
+//   }
+//   return servicePoints;
+// };
+
+// module.exports = initialize();
