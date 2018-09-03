@@ -90,6 +90,7 @@ const connect = function(serviceKey, params, opts = {}) {
   let turbotConfig = {};
   if (process.env.TURBOT_CONFIG_ENV) {
     try {
+      log.debug("Parsing TURBOT_CONFIG_ENV", process.env.TURBOT_CONFIG_ENV);
       turbotConfig = JSON.parse(process.env.TURBOT_CONFIG_ENV);
     } catch (e) {
       log.error("Error setting proxy server for aws-sdk", e);
