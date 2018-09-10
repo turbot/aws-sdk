@@ -1,0 +1,18 @@
+---
+root: true
+
+extends:
+  - "plugin:prettier/recommended"
+  - "eslint:recommended"
+  - "plugin:you-dont-need-lodash-underscore/compatible"
+
+env:
+  es6: true
+  node: true
+  mocha: true
+
+parserOptions:
+  ecmaVersion: 8
+
+rules:
+  no-console: off
