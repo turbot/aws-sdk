@@ -1,6 +1,5 @@
 const _ = require("lodash");
 const errors = require("@turbot/errors");
-const localstackServices = require("./localstack-services");
 const log = require("@turbot/log");
 const micromatch = require("micromatch");
 const pa = require("proxy-agent");
@@ -77,13 +76,6 @@ const proxyAgent = function(serviceKey, turbotConfig) {
   return pa(proxyObj.href);
 };
 
-const localEndpoint = function(serviceKey) {
-  if (localstackServices[serviceKey].localPort) {
-    return "http://localhost:" + localstackServices[serviceKey].localPort;
-  }
-  throw errors.notImplemented(`No local endpoint available for testing AWS Service "${serviceKey}"`);
-};
-
 const connect = function(serviceKey, params, opts = {}) {
   // Parse env variable ourselves because we have issues with @turbot/config + npm + git
   // npm believe each @turbot/config is a separate version and therefore it's loaded multiple times
@@ -150,12 +142,6 @@ const connect = function(serviceKey, params, opts = {}) {
     params.httpOptions = {
       agent: proxy
     };
-  }
-
-  // If they have signalled test mode, then try connecting to a localstack
-  // endpoint.
-  if (process.env.TURBOT_TEST || _.get(turbotConfig, "aws.test")) {
-    params.endpoint = localEndpoint(serviceKey);
   }
 
   // We always default to the best practice v4 unless otherwise specified.
