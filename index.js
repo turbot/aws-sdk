@@ -112,27 +112,13 @@ const connect = function(serviceKey, params, opts = {}) {
 
   if (!params) params = {};
 
-  if (process.env.TURBOT_CONTROL_AWS_CREDENTIALS) {
-    try {
-      log.debug("Parsing TURBOT_CONTROL_AWS_CREDENTIALS", process.env.TURBOT_CONTROL_AWS_CREDENTIALS);
-      const creds = JSON.parse(process.env.TURBOT_CONTROL_AWS_CREDENTIALS);
-      log.debug("Setting params.credentials to", { credentials: creds });
-      params.credentials = creds;
-    } catch (e) {
-      log.error("Error parsing TURBOT_CONTROL_AWS_CREDENTIALS, credentials not stored", { error: e });
-    }
-  }
-
   // If running in Lambda setup, set the default region based on the:
   // https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html
   // AWS_DEFAULT_REGION is the first preference
   if (!params.region) {
     params.region = process.env.AWS_DEFAULT_REGION;
     if (!params.region) {
-      params.region = process.env.TURBOT_CONTROL_AWS_REGION;
-      if (!params.region) {
-        params.region = _.get(turbotConfig, "env.region");
-      }
+      params.region = _.get(turbotConfig, "env.region");
     }
   }
 
