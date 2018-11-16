@@ -1,3 +1,17 @@
+const AWS = require("aws-sdk");
+
+/**
+ * AWS JavaScript SDK caches the *environment variables* credentials at load time. These are the
+ * AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
+ *
+ * This presents difficulties when we are 'sharing' the same Lambda function for multiple accounts.
+ *
+ * By setting this value to null we clear the 'cache' and the AWS SDK will instantiate the service classes,
+ * i.e. SQS, S3, with credentials from the environment variable (if it's not passed in during the construction).
+ *
+ */
+AWS.config.credentials = null;
+
 const _ = require("lodash");
 const errors = require("@turbot/errors");
 const log = require("@turbot/log");
@@ -94,9 +108,9 @@ const connect = function(serviceKey, params, opts = {}) {
 
   if (process.env.TURBOT_TRACE === "true" || opts.trace) {
     const xray = require("@turbot/xray");
-    aws = xray.captureAWS(require("aws-sdk"));
+    aws = xray.captureAWS(AWS);
   } else {
-    aws = require("aws-sdk");
+    aws = AWS;
   }
 
   // Development or test setup to record VCR cassetttes
