@@ -96,7 +96,7 @@ const connect = function(serviceKey, params, opts = {}) {
   let turbotConfig = {};
   if (process.env.TURBOT_CONFIG_ENV) {
     try {
-      log.debug("Parsing TURBOT_CONFIG_ENV", process.env.TURBOT_CONFIG_ENV);
+      //log.debug("Parsing TURBOT_CONFIG_ENV", process.env.TURBOT_CONFIG_ENV);
       turbotConfig = JSON.parse(process.env.TURBOT_CONFIG_ENV);
     } catch (e) {
       log.error("Error setting proxy server for aws-sdk", e);
@@ -149,7 +149,8 @@ const connect = function(serviceKey, params, opts = {}) {
     params.signatureVersion = "v4";
   }
 
-  log.debug("Instantiating service", { serviceKey: serviceKey, params: params });
+  // This is too noisy even in debug mode
+  // log.debug("Instantiating service", { serviceKey: serviceKey, params: params });
   return new aws[serviceKey](params);
 };
 
