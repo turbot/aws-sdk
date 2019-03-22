@@ -2,7 +2,7 @@
   "name": "@turbot/aws-sdk",
   "author": "Turbot HQ, Inc",
   "version": "5.0.0-alpha.1",
-  "private": true,
+  "license": "SEE LICENSE IN LICENSE",
   "main": "index.js",
   "scripts": {
     "coverage": "npx nyc npm test",
@@ -20,7 +20,7 @@
     "test-console": "1.1.0"
   },
   "dependencies": {
-    "@turbot/errors": "git+ssh://git@github.com:turbotio/errors.git",
+    "@turbot/errors": "5.0.0-beta.1",
     "@turbot/log": "git+ssh://git@github.com:turbotio/log.git",
     "@turbot/xray": "git+ssh://git@github.com:turbotio/xray.git",
     "aws-sdk": "2.401.0",
