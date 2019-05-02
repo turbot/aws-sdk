@@ -106,12 +106,13 @@ const connect = function(serviceKey, params, opts = {}) {
 
   let aws;
 
-  if (process.env.TURBOT_TRACE === "true" || opts.trace) {
-    const xray = require("@turbot/xray");
-    aws = xray.captureAWS(AWS);
-  } else {
-    aws = AWS;
-  }
+  // We're not using xRay just yet.
+  // if (process.env.TURBOT_TRACE === "true" || opts.trace) {
+  //   const xray = require("@turbot/xray");
+  //   aws = xray.captureAWS(AWS);
+  // } else {
+  aws = AWS;
+  // }
 
   // Development or test setup to record VCR cassetttes
   if (process.env.NODE_ENV === "local-development") {
