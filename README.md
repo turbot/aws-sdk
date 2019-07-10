@@ -1,7 +1,5 @@
 # @turbot/aws-sdk
 
-Note: experimental version. For research & development purpose only.
-
 Simple, Turbot specific wrapper for aws-sdk that adds support for our standard
 approach to:
 
