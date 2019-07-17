@@ -150,8 +150,10 @@ const connect = function(serviceKey, params, opts = {}) {
     params.signatureVersion = "v4";
   }
 
-  // This is too noisy even in debug mode
-  // log.debug("Instantiating service", { serviceKey: serviceKey, params: params });
+  if (serviceKey.indexOf(".") > -1) {
+    const service = _.get(aws, serviceKey);
+    return new service(params);
+  }
   return new aws[serviceKey](params);
 };
 
