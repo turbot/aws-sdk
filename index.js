@@ -17,6 +17,7 @@ const errors = require("@turbot/errors");
 const log = require("@turbot/log");
 const micromatch = require("micromatch");
 const pa = require("proxy-agent");
+const request = require("request");
 const { URL } = require("url");
 
 // AWS SDK requires the use of proxy-agent. Unfortunately it's very limited
@@ -157,7 +158,27 @@ const connect = function(serviceKey, params, opts = {}) {
   return new aws[serviceKey](params);
 };
 
+const awsIamSignedRequest = (opts, service, credentials, callback) => {
+  const awsOptions = {
+    aws: {
+      key: credentials.AccessKeyId,
+      secret: credentials.SecretAccessKey,
+      session: credentials.SessionToken,
+      service,
+      sign_version: "4"
+    }
+  };
+  const endpoint = new URL(opts.uri).hostname.toString();
+  const headers = Object.assign({}, opts.headers, { host: endpoint });
+  const optionsWithHeaders = Object.assign({}, opts, { headers });
+  const optionsWithAwsCreds = Object.assign({}, optionsWithHeaders, awsOptions);
+  request(optionsWithAwsCreds, function(error, response, body) {
+    callback(error, body);
+  });
+};
+
 module.exports = {
+  awsIamSignedRequest,
   connect
 };
 
