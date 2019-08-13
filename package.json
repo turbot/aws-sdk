@@ -2,7 +2,7 @@
   "name": "@turbot/aws-sdk",
   "author": "Turbot HQ, Inc",
   "description": "Turbot aws-sdk wrapper.",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "license": "SEE LICENSE IN LICENSE",
   "main": "index.js",
   "repository": {
@@ -14,7 +14,7 @@
     "test": "npx mocha"
   },
   "dependencies": {
-    "@turbot/errors": "5.0.0",
+    "@turbot/errors": "5.0.2",
     "@turbot/log": "5.0.1",
     "aws4": "1.8.0",
     "aws-sdk": "2.503.0",
