@@ -177,9 +177,51 @@ const awsIamSignedRequest = (opts, service, credentials, callback) => {
   });
 };
 
+const customBackoff = retryCount => {
+  // The standard AWS algorithm does up to 3 retries with exponential backoff. But,
+  // the actual delay is random between 0 and the calculated backoff number. So,
+  // in reality the delays are:
+  //   0. First attempt, immediate.
+  //   1. First retry, after a delay of between 0 and 100ms.
+  //   2. Second retry, after a delay of between 0 and 200ms.
+  //   3. Final retry, after a delay of between 0 and 400ms.
+  //
+  // We need a more reliable backoff, with a very large delay by the end to try
+  // and ensure we can get all of the items even for services with very low
+  // throttling rates.
+  //
+  // Our approach uses the same base (100ms), but does 10 retries and ensures the
+  // delay is within +/- 10% of the calculated delay (not 0 to 100% of it):
+  //   0. First attempt, immediate.
+  //   1. First retry, after a delay of between 90 and 110ms.
+  //   2. Second retry, after a delay of between 180 and 220ms.
+  //   3. Third retry, after a delay of between 360 and 440ms.
+  //   ...
+  //   10. Tenth retry, after a delay of between 92160 and 112640ms.
+  const total = Math.pow(2, retryCount) * 100;
+  const base = total * 0.9;
+  const variation = total * 0.2 * Math.random();
+  const result = base + variation;
+  return result;
+};
+
+const defaultMaxRetries = 10;
+
+const discoveryParams = region => {
+  return {
+    region: region,
+    maxRetries: defaultMaxRetries,
+    retryDelayOptions: {
+      customBackoff: customBackoff
+    }
+  };
+};
+
 module.exports = {
   awsIamSignedRequest,
-  connect
+  connect,
+  customBackoff,
+  discoveryParams
 };
 
 // const initialize = function() {
