@@ -2,6 +2,10 @@
 
 # Release History
 
+## 5.0.3 [2019-10-09]
+
+- Added: custom backoff function for resource discovery.
+
 ## 5.0.2 [2019-08-13]
 
 - Updated: aws-sdk to 2.503.0.
