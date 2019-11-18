@@ -2,6 +2,10 @@
 
 # Release History
 
+## 5.0.4 [2019-11-18]
+
+- Updated: dependencies.
+
 ## 5.0.3 [2019-10-09]
 
 - Added: custom backoff function for resource discovery.
