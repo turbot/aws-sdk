@@ -2,7 +2,7 @@
   "name": "@turbot/aws-sdk",
   "author": "Turbot HQ, Inc",
   "description": "Turbot aws-sdk wrapper.",
-  "version": "5.0.4",
+  "version": "5.0.5",
   "license": "SEE LICENSE IN LICENSE",
   "main": "index.js",
   "repository": {
@@ -17,7 +17,7 @@
     "@turbot/errors": "5.0.4",
     "@turbot/log": "5.0.2",
     "aws4": "1.8.0",
-    "aws-sdk": "2.503.0",
+    "aws-sdk": "2.585.0",
     "lodash": "4.17.14",
     "micromatch": "4.0.2",
     "proxy-agent": "3.1.0",
