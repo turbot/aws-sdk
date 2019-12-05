@@ -2,6 +2,10 @@
 
 # Release History
 
+## 5.0.5 [2019-12-06]
+
+- Updated: aws-sdk to version 2.585.0.
+
 ## 5.0.4 [2019-11-18]
 
 - Updated: dependencies.

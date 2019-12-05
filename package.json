@@ -2,7 +2,7 @@
   "name": "@turbot/aws-sdk",
   "author": "Turbot HQ, Inc",
   "description": "Turbot aws-sdk wrapper.",
-  "version": "5.0.4",
+  "version": "5.0.5",
   "license": "SEE LICENSE IN LICENSE",
   "main": "index.js",
   "repository": {
