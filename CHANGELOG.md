@@ -2,6 +2,10 @@
 
 # Release History
 
+## 5.0.7 [2019-12-19]
+
+- Fixed: removed a test file that contains AWS Access Key.
+
 ## 5.0.6 [2019-12-19]
 
 - Updated: License to Apache 2.0.
