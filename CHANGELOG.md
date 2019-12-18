@@ -2,6 +2,12 @@
 
 # Release History
 
+## 5.0.6 [2019-12-19]
+
+- Updated: License to Apache 2.0.
+- Updated: @turbot/errors to 5.0.4. Update @turbot/log to 5.0.2.
+- Updated: dev dependencies.
+
 ## 5.0.5 [2019-12-06]
 
 - Updated: aws-sdk to version 2.585.0.

@@ -2,8 +2,8 @@
   "name": "@turbot/aws-sdk",
   "author": "Turbot HQ, Inc",
   "description": "Turbot aws-sdk wrapper.",
-  "version": "5.0.5",
-  "license": "SEE LICENSE IN LICENSE",
+  "version": "5.0.6",
+  "license": "Apache-2.0",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -14,8 +14,8 @@
     "test": "npx mocha"
   },
   "dependencies": {
-    "@turbot/errors": "5.0.4",
-    "@turbot/log": "5.0.2",
+    "@turbot/errors": "5.0.5",
+    "@turbot/log": "5.0.3",
     "aws4": "1.8.0",
     "aws-sdk": "2.585.0",
     "lodash": "4.17.14",
@@ -25,13 +25,14 @@
   },
   "devDependencies": {
     "chai": "4.2.0",
-    "eslint": "6.0.1",
-    "eslint-config-prettier": "4.3.0",
-    "eslint-plugin-prettier": "3.1.0",
-    "eslint-plugin-you-dont-need-lodash-underscore": "6.5.0",
+    "eslint": "6.5.0",
+    "eslint-config-prettier": "6.4.0",
+    "eslint-plugin-prettier": "3.1.1",
+    "eslint-plugin-you-dont-need-lodash-underscore": "6.8.0",
     "mocha": "5.2.0",
     "nyc": "14.1.1",
-    "prettier": "1.18.2",
+    "mocha-sinon": "2.1.0",
+    "prettier": "1.19.1",
     "test-console": "1.1.0"
   }
 }
