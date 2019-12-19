@@ -5,6 +5,3 @@ approach to:
 
 - testing / mocking
 - proxy servers
-- xray tracing
-
-Configuration of turbot-aws is available through turbot-config.
