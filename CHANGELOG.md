@@ -2,6 +2,11 @@
 
 # Release History
 
+## 5.0.8 [2020-02-05]
+
+- Updated: @turbot/utils to v5.0.5.
+- Updated: lodash to v4.17.15
+
 ## 5.0.7 [2019-12-19]
 
 - Fixed: removed a test file that contains AWS Access Key.
