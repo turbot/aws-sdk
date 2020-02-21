@@ -17,7 +17,7 @@
     "@turbot/errors": "5.0.5",
     "@turbot/log": "5.0.5",
     "aws4": "1.8.0",
-    "aws-sdk": "2.585.0",
+    "aws-sdk": "2.623.0",
     "lodash": "4.17.15",
     "micromatch": "4.0.2",
     "proxy-agent": "3.1.0",
