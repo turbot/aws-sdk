@@ -2,6 +2,10 @@
 
 # Release History
 
+## 5.1.0 [2020-02-21]
+
+- Updated: @turbot/utils to 2.623.0.
+
 ## 5.0.8 [2020-02-05]
 
 - Updated: @turbot/utils to v5.0.5.
