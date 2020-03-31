@@ -2,6 +2,11 @@
 
 # Release History
 
+## 5.2.0 [2020-03-31]
+
+- Updated: aws-sdk to version 2.649.0.
+- Updated: dev dependencies.
+
 ## 5.1.0 [2020-02-21]
 
 - Updated: @turbot/utils to 2.623.0.
