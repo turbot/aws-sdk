@@ -38,7 +38,7 @@ const { URL } = require("url");
 //   aws.proxy.enabled = ['*']
 //   aws.proxy.disabled = []
 
-const proxyAgent = function(serviceKey, turbotConfig) {
+const proxyAgent = function (serviceKey, turbotConfig) {
   let awsProxy = _.get(turbotConfig, "aws.proxy");
   if (awsProxy) {
     awsProxy = _.cloneDeep(awsProxy);
@@ -49,7 +49,7 @@ const proxyAgent = function(serviceKey, turbotConfig) {
   _.defaults(awsProxy, {
     https_proxy: process.env.https_proxy || process.env.HTTPS_PROXY,
     enabled: ["*"],
-    disabled: []
+    disabled: [],
   });
   // If there is no proxy defined, we have nothing to do.
   if (!awsProxy.https_proxy) {
@@ -57,7 +57,7 @@ const proxyAgent = function(serviceKey, turbotConfig) {
   }
   // PRE: There is a proxy.
   let serviceLower = serviceKey.toLowerCase();
-  let disabledServices = awsProxy.disabled.map(i => {
+  let disabledServices = awsProxy.disabled.map((i) => {
     return i.toLowerCase();
   });
   // If the service matches any of the disabled wildcards then the proxy should
@@ -66,7 +66,7 @@ const proxyAgent = function(serviceKey, turbotConfig) {
     return null;
   }
   // PRE: The proxy is not explicitly disabled.
-  let enabledServices = awsProxy.enabled.map(i => {
+  let enabledServices = awsProxy.enabled.map((i) => {
     return i.toLowerCase();
   });
   // If not enabled, then no proxy.
@@ -91,7 +91,7 @@ const proxyAgent = function(serviceKey, turbotConfig) {
   return pa(proxyObj.href);
 };
 
-const connect = function(serviceKey, params, opts = {}) {
+const connect = function (serviceKey, params, opts = {}) {
   // Parse env variable ourselves because we have issues with @turbot/config + npm + git
   // npm believe each @turbot/config is a separate version and therefore it's loaded multiple times
   let turbotConfig = {};
@@ -142,7 +142,7 @@ const connect = function(serviceKey, params, opts = {}) {
   let proxy = proxyAgent(serviceKey, turbotConfig);
   if (proxy) {
     params.httpOptions = {
-      agent: proxy
+      agent: proxy,
     };
   }
 
@@ -165,19 +165,19 @@ const awsIamSignedRequest = (opts, service, credentials, callback) => {
       secret: credentials.SecretAccessKey,
       session: credentials.SessionToken,
       service,
-      sign_version: "4"
-    }
+      sign_version: "4",
+    },
   };
   const endpoint = new URL(opts.uri).hostname.toString();
   const headers = Object.assign({}, opts.headers, { host: endpoint });
   const optionsWithHeaders = Object.assign({}, opts, { headers });
   const optionsWithAwsCreds = Object.assign({}, optionsWithHeaders, awsOptions);
-  request(optionsWithAwsCreds, function(error, response, body) {
+  request(optionsWithAwsCreds, function (error, response, body) {
     callback(error, body);
   });
 };
 
-const customBackoff = retryCount => {
+const customBackoff = (retryCount) => {
   // The standard AWS algorithm does up to 3 retries with exponential backoff. But,
   // the actual delay is random between 0 and the calculated backoff number. So,
   // in reality the delays are:
@@ -207,13 +207,13 @@ const customBackoff = retryCount => {
 
 const defaultMaxRetries = 10;
 
-const discoveryParams = region => {
+const discoveryParams = (region) => {
   return {
     region: region,
     maxRetries: defaultMaxRetries,
     retryDelayOptions: {
-      customBackoff: customBackoff
-    }
+      customBackoff: customBackoff,
+    },
   };
 };
 
@@ -221,7 +221,7 @@ module.exports = {
   awsIamSignedRequest,
   connect,
   customBackoff,
-  discoveryParams
+  discoveryParams,
 };
 
 // const initialize = function() {
