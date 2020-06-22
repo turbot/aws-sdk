@@ -2,6 +2,11 @@
 
 # Release History
 
+## 5.4.0 [2020-06-22]
+
+- Updated: aws-sdk to 2.701.0.
+- Updated: Removed aws4 from dependencies. Removed mocha-sinon from dev dependencies.
+
 ## 5.3.0 [2020-04-30]
 
 - Updated: @turbot/log to 5.1.0, aws-sdk to 2.666.0, proxy-agent to 3.1.0, request to 2.88.2, aws4 to 1.9.1 and various dev dependencies.
