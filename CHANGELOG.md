@@ -2,6 +2,10 @@
 
 # Release History
 
+## 5.5.0 [2020-07-30]
+
+- Updated: @turbot/errors to 5.1.0. @turbot/log to 5.2.0. aws-sdk to ^2.723.0. lodash to ^4.17.19. Various dev dependencies.
+
 ## 5.4.0 [2020-06-22]
 
 - Updated: aws-sdk to 2.701.0.
