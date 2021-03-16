@@ -151,10 +151,20 @@ const connect = function (serviceKey, params, opts = {}) {
     params.signatureVersion = "v4";
   }
 
+  if (!_.isEmpty(params.customUserAgent)) {
+    // We can also set it like this:
+    // AWS.config.update({ customUserAgent: "Turbot/5 APN_137229" });
+    // but this way we can combine our default setting with customer user setting.
+    params.customUserAgent = "Turbot/5 (APN_137229) " + params.customUserAgent;
+  } else {
+    params.customUserAgent = "Turbot/5 (APN_137229)";
+  }
+
   if (serviceKey.indexOf(".") > -1) {
     const service = _.get(aws, serviceKey);
     return new service(params);
   }
+
   return new aws[serviceKey](params);
 };
 
