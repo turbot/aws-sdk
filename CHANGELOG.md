@@ -2,6 +2,10 @@
 
 # Release History
 
+## 5.6.0 [2021-03-17]
+
+- Added: Turbot info in the user agent field.
+
 ## 5.5.1 [2020-11-12]
 
 - Updated: aws-sdk to ^2.789, lodash to ^4.17.20.
