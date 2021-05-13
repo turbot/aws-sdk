@@ -160,6 +160,15 @@ const connect = function (serviceKey, params, opts = {}) {
     params.customUserAgent = "Turbot/5 (APN_137229)";
   }
 
+  if (_.isEmpty(params.maxRetries)) {
+    params.maxRetries = defaultMaxRetries;
+  }
+  if (_.isEmpty(params.retryDelayOptions)) {
+    params.retryDelayOptions = {
+      customBackoff: defaultCustomBackoff
+    }
+  }
+
   if (serviceKey.indexOf(".") > -1) {
     const service = _.get(aws, serviceKey);
     return new service(params);
@@ -187,7 +196,39 @@ const awsIamSignedRequest = (opts, service, credentials, callback) => {
   });
 };
 
-const customBackoff = (retryCount) => {
+const defaultMaxRetries = 3;
+
+const defaultCustomBackoff = (retryCount) => {
+  // The standard AWS algorithm does up to 3 retries with exponential backoff. But,
+  // the actual delay is random between 0 and the calculated backoff number. So,
+  // in reality the delays are:
+  //   0. First attempt, immediate.
+  //   1. First retry, after a delay of between 0 and 100ms.
+  //   2. Second retry, after a delay of between 0 and 200ms.
+  //   3. Final retry, after a delay of between 0 and 400ms.
+  //
+  // Our approach uses 1 second base and similar 3 retries
+  // delay is within +/- 10% of the calculated delay (not 0 to 100% of it):
+  //   0. First attempt, immediate.
+  //   1. First retry, after a delay of between 900 and 1100ms.
+  //   2. Second retry, after a delay of between 1800 and 2200ms.
+  //   3. Third retry, after a delay of between 3600 and 4400ms.
+  //
+  // That's it, unlike discovery that has 10 retries, the default backoff should be just
+  // the 3 retries
+  //
+  const total = Math.pow(2, retryCount) * 1000;
+  const base = total * 0.9;
+  const variation = total * 0.2 * Math.random();
+  const result = base + variation;
+  return result;
+}
+
+const customBackoffForDiscovery = (retryCount) => {
+  //
+  // For discovery - very expensive to fail after the middle of the page, we
+  // want to be very conservative, ergo max retries of 10
+  //
   // The standard AWS algorithm does up to 3 retries with exponential backoff. But,
   // the actual delay is random between 0 and the calculated backoff number. So,
   // in reality the delays are:
@@ -215,14 +256,14 @@ const customBackoff = (retryCount) => {
   return result;
 };
 
-const defaultMaxRetries = 10;
+const defaultMaxRetriesForDiscovery = 10;
 
 const discoveryParams = (region) => {
   return {
     region: region,
-    maxRetries: defaultMaxRetries,
+    maxRetries: defaultMaxRetriesForDiscovery,
     retryDelayOptions: {
-      customBackoff: customBackoff,
+      customBackoff: customBackoffForDiscovery,
     },
   };
 };
@@ -230,7 +271,7 @@ const discoveryParams = (region) => {
 module.exports = {
   awsIamSignedRequest,
   connect,
-  customBackoff,
+  customBackoff: customBackoffForDiscovery,
   discoveryParams,
 };
 

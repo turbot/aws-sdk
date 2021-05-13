@@ -2,6 +2,10 @@
 
 # Release History
 
+## 5.7.0 [2021-05-13]
+
+- Updated: default custom backoff will retry with the following backoff: 1) 900 and 1100ms, 2) 1800 and 2200ms, 3) 3600 and 4400ms. This default value can be overriden.
+
 ## 5.6.0 [2021-03-17]
 
 - Added: Turbot info in the user agent field.
