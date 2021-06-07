@@ -2,6 +2,10 @@
 
 # Release History
 
+## 5.8.0 [2021-06-07]
+
+- Updated: @turbot/errors to 5.2.0. @turbot/log to 5.3.0. micromatch to 4.0.4. proxy-agent to 4.0.1. Various dev dependencies.
+
 ## 5.7.0 [2021-05-13]
 
 - Updated: default custom backoff will retry with the following backoff: 1) 900 and 1100ms, 2) 1800 and 2200ms, 3) 3600 and 4400ms. This default value can be overriden.
