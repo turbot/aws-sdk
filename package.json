@@ -16,7 +16,7 @@
   "dependencies": {
     "@turbot/errors": "5.2.0",
     "@turbot/log": "5.3.0",
-    "aws-sdk": "^2.789",
+    "aws-sdk": "^2.922",
     "lodash": "^4.17.21",
     "micromatch": "4.0.4",
     "proxy-agent": "4.0.1",
