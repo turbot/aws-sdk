@@ -2,6 +2,11 @@
 
 # Release History
 
+## 5.9.0 [2022-04-04]
+
+- Updated: proxy-agent to 5.0.0
+- Fixed: Simplify user agent field to avoid potential ever increasing size #39
+
 ## 5.8.0 [2021-06-07]
 
 - Updated: @turbot/errors to 5.2.0. @turbot/log to 5.3.0. micromatch to 4.0.4. proxy-agent to 4.0.1. Various dev dependencies.
