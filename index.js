@@ -152,11 +152,6 @@ const connect = function (serviceKey, params, opts = {}) {
   }
 
   if (!_.isEmpty(params.customUserAgent)) {
-    // We can also set it like this:
-    // AWS.config.update({ customUserAgent: "Turbot/5 APN_137229" });
-    // but this way we can combine our default setting with customer user setting.
-    params.customUserAgent = "Turbot/5 (APN_137229) " + params.customUserAgent;
-  } else {
     params.customUserAgent = "Turbot/5 (APN_137229)";
   }
 
@@ -165,8 +160,8 @@ const connect = function (serviceKey, params, opts = {}) {
   }
   if (_.isEmpty(params.retryDelayOptions)) {
     params.retryDelayOptions = {
-      customBackoff: defaultCustomBackoff
-    }
+      customBackoff: defaultCustomBackoff,
+    };
   }
 
   if (serviceKey.indexOf(".") > -1) {
@@ -222,7 +217,7 @@ const defaultCustomBackoff = (retryCount) => {
   const variation = total * 0.2 * Math.random();
   const result = base + variation;
   return result;
-}
+};
 
 const customBackoffForDiscovery = (retryCount) => {
   //
