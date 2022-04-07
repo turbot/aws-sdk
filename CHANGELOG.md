@@ -2,6 +2,10 @@
 
 # Release History
 
+## 5.10.0 [2022-04-07]
+
+- Updated: replaced proxy-agent with https-proxy-agent to reduce external dependencies. In particular vm2 dependency brought in by `pac-proxy-agent` which we don't need (we don't support PAC proxy files).
+
 ## 5.9.0 [2022-04-04]
 
 - Updated: proxy-agent to 5.0.0

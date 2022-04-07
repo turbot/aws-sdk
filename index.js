@@ -16,9 +16,9 @@ const _ = require("lodash");
 const errors = require("@turbot/errors");
 const log = require("@turbot/log");
 const micromatch = require("micromatch");
-const pa = require("proxy-agent");
 const request = require("request");
 const { URL } = require("url");
+const HttpsProxyAgent = require("https-proxy-agent");
 
 // AWS SDK requires the use of proxy-agent. Unfortunately it's very limited
 // to the point where it doesn't support either environment variables and has
@@ -88,7 +88,9 @@ const proxyAgent = function (serviceKey, turbotConfig) {
     log.error(errors.badConfiguration("Invalid URL configuration in aws.proxy.https_proxy", { error: e }));
     return null;
   }
-  return pa(proxyObj.href);
+
+  const agent = new HttpsProxyAgent(proxyObj.href);
+  return agent;
 };
 
 const connect = function (serviceKey, params, opts = {}) {
