@@ -2,6 +2,10 @@
 
 # Release History
 
+## 5.12.0 [2023-11-21]
+
+- Updated: @turbot/errors to 5.3.0. @turbot/log to 5.4.0. aws-sdk to 2.1500. micromatch to 4.0.5. chai to 4.3.10.
+
 ## 5.11.0 [2022-06-22]
 
 - Updated: @turbot/utils to 5.5.0. json-schema to 0.4.0 (from 0.2.3).
