@@ -2,6 +2,10 @@
 
 # Release History
 
+## 5.13.0 [2023-12-06]
+
+- Updated: aws-sdk to 2.922.
+
 ## 5.12.0 [2023-11-21]
 
 - Updated: @turbot/errors to 5.3.0. @turbot/log to 5.4.0. aws-sdk to 2.1500. micromatch to 4.0.5. chai to 4.3.10.
