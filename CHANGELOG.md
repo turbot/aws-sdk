@@ -2,6 +2,10 @@
 
 # Release History
 
+## 5.14.0 [2024-05-22]
+
+- Updated: aws-sdk to 2.1146.
+
 ## 5.13.0 [2023-12-06]
 
 - Updated: aws-sdk to 2.922.
