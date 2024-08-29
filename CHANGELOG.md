@@ -4,7 +4,7 @@
 
 ## 5.15.0 [TBD]
 
-- Updated: micromatch to 4.0.8 (from 4.0.5).
+- Updated: micromatch to 4.0.8 (from 4.0.5). aws-sdk to 2.1685.0.
 - Updated: replaced request package with fetch.
 
 ## 5.14.0 [2024-05-22]
