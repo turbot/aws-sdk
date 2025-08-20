@@ -1,4 +1,5 @@
 const AWS = require("aws-sdk");
+const aws4 = require("aws4");
 
 /**
  * AWS JavaScript SDK caches the *environment variables* credentials at load time. These are the
@@ -16,7 +17,6 @@ const _ = require("lodash");
 const errors = require("@turbot/errors");
 const log = require("@turbot/log");
 const micromatch = require("micromatch");
-const request = require("request");
 const { URL } = require("url");
 const HttpsProxyAgent = require("https-proxy-agent");
 
@@ -184,13 +184,42 @@ const awsIamSignedRequest = (opts, service, credentials, callback) => {
       sign_version: "4",
     },
   };
-  const endpoint = new URL(opts.uri).hostname.toString();
-  const headers = Object.assign({}, opts.headers, { host: endpoint });
-  const optionsWithHeaders = Object.assign({}, opts, { headers });
-  const optionsWithAwsCreds = Object.assign({}, optionsWithHeaders, awsOptions);
-  request(optionsWithAwsCreds, function (error, response, body) {
-    callback(error, body);
+
+  // Parse the URL to get the hostname and path
+  const url = new URL(opts.uri);
+  const hostname = url.hostname;
+  const path = url.pathname + url.search;
+
+  const requestOptions = {
+    host: hostname,
+    path: path,
+    method: opts.method,
+    headers: {
+      ...opts.headers,
+      host: new URL(opts.uri).hostname.toString(),
+    },
+    body: opts.body ? JSON.stringify(opts.body) : null,
+    service: service,
+  };
+
+  aws4.sign(requestOptions, {
+    accessKeyId: awsOptions.aws.key,
+    secretAccessKey: awsOptions.aws.secret,
+    sessionToken: awsOptions.aws.session,
   });
+
+  fetch(opts.uri, {
+    method: requestOptions.method,
+    headers: requestOptions.headers,
+    body: requestOptions.body,
+  })
+    .then((response) => response.json())
+    .then((body) => {
+      callback(null, body);
+    })
+    .catch((error) => {
+      callback(error);
+    });
 };
 
 const defaultMaxRetries = 3;
