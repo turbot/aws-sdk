@@ -4,7 +4,7 @@
 
 ## 5.16.0 [TBD]
 
-- Updated: Remove dependency on `request` package.
+- Updated: The deprecated request package has been removed and replaced with a supported alternative.
 
 ## 5.15.0 [2024-08-10]
 
