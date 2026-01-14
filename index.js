@@ -22,6 +22,7 @@ const HttpsProxyAgent = require("https-proxy-agent");
 
 // v3 proxies for SDK migration
 const { createS3Proxy } = require("./lib/s3-proxy");
+const { createSSMProxy } = require("./lib/ssm-proxy");
 
 // AWS SDK requires the use of proxy-agent. Unfortunately it's very limited
 // to the point where it doesn't support either environment variables and has
@@ -175,6 +176,12 @@ const connect = function (serviceKey, params, opts = {}) {
     return createS3Proxy(v3Config);
   }
 
+  // Use v3 proxy for SSM
+  if (serviceKey === "SSM") {
+    const v3Config = buildSSMV3Config(params);
+    return createSSMProxy(v3Config);
+  }
+
   if (serviceKey.indexOf(".") > -1) {
     const service = _.get(aws, serviceKey);
     return new service(params);
@@ -208,6 +215,36 @@ const buildS3V3Config = function (params) {
     if (params.s3ForcePathStyle) {
       v3Config.forcePathStyle = params.s3ForcePathStyle;
     }
+  }
+
+  // HTTP proxy support: if a proxy agent was configured by proxyAgent(),
+  // pass it to v3 via requestHandler. This enables corporate proxy routing.
+  if (params.httpOptions && params.httpOptions.agent) {
+    const { NodeHttpHandler } = require("@smithy/node-http-handler");
+    v3Config.requestHandler = new NodeHttpHandler({
+      httpsAgent: params.httpOptions.agent,
+    });
+  }
+
+  return v3Config;
+};
+
+/**
+ * Convert v2-style SSM params to v3 config format.
+ * Extracted as a separate function for testability.
+ */
+const buildSSMV3Config = function (params) {
+  const v3Config = {
+    region: params.region,
+  };
+
+  // Pass through credentials if provided
+  if (params.accessKeyId && params.secretAccessKey) {
+    v3Config.credentials = {
+      accessKeyId: params.accessKeyId,
+      secretAccessKey: params.secretAccessKey,
+      sessionToken: params.sessionToken,
+    };
   }
 
   // HTTP proxy support: if a proxy agent was configured by proxyAgent(),
@@ -345,6 +382,7 @@ const discoveryParams = (region) => {
 module.exports = {
   awsIamSignedRequest,
   buildS3V3Config, // Exported for testing
+  buildSSMV3Config, // Exported for testing
   connect,
   customBackoff: customBackoffForDiscovery,
   discoveryParams,

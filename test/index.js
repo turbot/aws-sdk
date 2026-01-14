@@ -3,11 +3,14 @@ const assert = require("chai").assert;
 const testConsole = require("test-console");
 const taws = require("..");
 
+// Tests for v2 client behavior (services that haven't been migrated to v3 yet)
+// Note: S3 and SSM now use v3 proxies - see s3-connect.test.js and ssm-connect.test.js
 describe("@turbot/aws-sdk", function () {
   describe("Default base case", function () {
     var conn;
     before(function () {
-      conn = taws.connect("SSM");
+      // Use SQS as it still uses v2 client (SSM now uses v3 proxy)
+      conn = taws.connect("SQS");
     });
     it("uses signature v4", function () {
       assert.equal(conn.config.signatureVersion, "v4");
@@ -21,7 +24,7 @@ describe("@turbot/aws-sdk", function () {
   describe("signatureVersion override", function () {
     var conn;
     before(function () {
-      conn = taws.connect("SSM", {
+      conn = taws.connect("SQS", {
         signatureVersion: "v3",
       });
     });
@@ -52,7 +55,7 @@ describe("@turbot/aws-sdk", function () {
       const region = "ap-northeast-1";
       before(function () {
         process.env.AWS_DEFAULT_REGION = region;
-        conn = taws.connect("SSM");
+        conn = taws.connect("SQS");
       });
       it("as expected", function () {
         assert.equal(conn.config.region, region);
@@ -65,7 +68,7 @@ describe("@turbot/aws-sdk", function () {
       before(function () {
         delete process.env.AWS_DEFAULT_REGION;
         process.env.TURBOT_CONFIG_ENV = JSON.stringify({ env: { region: region } });
-        conn = taws.connect("SSM");
+        conn = taws.connect("SQS");
       });
       it("as expected", function () {
         assert.equal(conn.config.region, region);
@@ -76,7 +79,7 @@ describe("@turbot/aws-sdk", function () {
       var conn;
       const region = "ap-northeast-3";
       before(function () {
-        conn = taws.connect("SSM", {
+        conn = taws.connect("SQS", {
           region: region,
         });
       });
@@ -110,7 +113,7 @@ describe("@turbot/aws-sdk", function () {
       };
       before(function () {
         process.env.TURBOT_CONFIG_ENV = JSON.stringify(proxy);
-        conn = taws.connect("SSM");
+        conn = taws.connect("SQS");
       });
       it("has proxy agent with correct host", function () {
         assert.exists(conn.config.httpOptions.agent);
@@ -131,7 +134,7 @@ describe("@turbot/aws-sdk", function () {
       before(function () {
         process.env.TURBOT_CONFIG_ENV = JSON.stringify(proxy);
         logLines = testConsole.stdout.inspectSync(function () {
-          conn = taws.connect("SSM");
+          conn = taws.connect("SQS");
         });
         logLine = JSON.parse(logLines[0]);
       });
