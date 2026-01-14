@@ -27,6 +27,13 @@ const { createSTSProxy } = require("./lib/sts-proxy");
 const { createKMSProxy } = require("./lib/kms-proxy");
 const { createSNSProxy } = require("./lib/sns-proxy");
 const { createLambdaProxy } = require("./lib/lambda-proxy");
+const { createSQSProxy } = require("./lib/sqs-proxy");
+const { createRDSProxy } = require("./lib/rds-proxy");
+const { createRDSSignerProxy } = require("./lib/rds-signer-proxy");
+const { createElastiCacheProxy } = require("./lib/elasticache-proxy");
+const { createIAMProxy } = require("./lib/iam-proxy");
+const { createSESProxy } = require("./lib/ses-proxy");
+const { createECSProxy } = require("./lib/ecs-proxy");
 
 // AWS SDK requires the use of proxy-agent. Unfortunately it's very limited
 // to the point where it doesn't support either environment variables and has
@@ -210,6 +217,48 @@ const connect = function (serviceKey, params, opts = {}) {
     return createLambdaProxy(v3Config);
   }
 
+  // Use v3 proxy for RDS
+  if (serviceKey === "RDS") {
+    const v3Config = buildV3Config(params);
+    return createRDSProxy(v3Config);
+  }
+
+  // Use v3 proxy for ElastiCache
+  if (serviceKey === "ElastiCache") {
+    const v3Config = buildV3Config(params);
+    return createElastiCacheProxy(v3Config);
+  }
+
+  // Use v3 proxy for SQS
+  if (serviceKey === "SQS") {
+    const v3Config = buildV3Config(params);
+    return createSQSProxy(v3Config);
+  }
+
+  // Use v3 proxy for RDS.Signer
+  if (serviceKey === "RDS.Signer") {
+    const v3Config = buildRDSSignerV3Config(params);
+    return createRDSSignerProxy(v3Config);
+  }
+
+  // Use v3 proxy for IAM
+  if (serviceKey === "IAM") {
+    const v3Config = buildV3Config(params);
+    return createIAMProxy(v3Config);
+  }
+
+  // Use v3 proxy for SES
+  if (serviceKey === "SES") {
+    const v3Config = buildV3Config(params);
+    return createSESProxy(v3Config);
+  }
+
+  // Use v3 proxy for ECS
+  if (serviceKey === "ECS") {
+    const v3Config = buildV3Config(params);
+    return createECSProxy(v3Config);
+  }
+
   if (serviceKey.indexOf(".") > -1) {
     const service = _.get(aws, serviceKey);
     return new service(params);
@@ -311,6 +360,30 @@ const buildV3Config = function (params) {
     v3Config.requestHandler = new NodeHttpHandler({
       httpsAgent: params.httpOptions.agent,
     });
+  }
+
+  return v3Config;
+};
+
+/**
+ * Convert v2-style RDS.Signer params to v3 config format.
+ * RDS.Signer has special requirements: hostname, port, username.
+ */
+const buildRDSSignerV3Config = function (params) {
+  const v3Config = {
+    region: params.region,
+    hostname: params.hostname,
+    port: params.port,
+    username: params.username,
+  };
+
+  // Pass through credentials if provided
+  if (params.accessKeyId && params.secretAccessKey) {
+    v3Config.credentials = {
+      accessKeyId: params.accessKeyId,
+      secretAccessKey: params.secretAccessKey,
+      sessionToken: params.sessionToken,
+    };
   }
 
   return v3Config;
@@ -441,6 +514,7 @@ module.exports = {
   buildS3V3Config, // Exported for testing
   buildSSMV3Config, // Exported for testing
   buildV3Config, // Exported for testing
+  buildRDSSignerV3Config, // Exported for testing
   connect,
   customBackoff: customBackoffForDiscovery,
   discoveryParams,
