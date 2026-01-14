@@ -34,6 +34,11 @@ const { createElastiCacheProxy } = require("./lib/elasticache-proxy");
 const { createIAMProxy } = require("./lib/iam-proxy");
 const { createSESProxy } = require("./lib/ses-proxy");
 const { createECSProxy } = require("./lib/ecs-proxy");
+const { createCloudWatchLogsProxy } = require("./lib/cloudwatchlogs-proxy");
+const { createAutoScalingProxy } = require("./lib/autoscaling-proxy");
+const { createCloudWatchProxy } = require("./lib/cloudwatch-proxy");
+const { createEC2Proxy } = require("./lib/ec2-proxy");
+const { createS3ControlProxy } = require("./lib/s3control-proxy");
 
 // AWS SDK requires the use of proxy-agent. Unfortunately it's very limited
 // to the point where it doesn't support either environment variables and has
@@ -257,6 +262,36 @@ const connect = function (serviceKey, params, opts = {}) {
   if (serviceKey === "ECS") {
     const v3Config = buildV3Config(params);
     return createECSProxy(v3Config);
+  }
+
+  // Use v3 proxy for CloudWatchLogs
+  if (serviceKey === "CloudWatchLogs") {
+    const v3Config = buildV3Config(params);
+    return createCloudWatchLogsProxy(v3Config);
+  }
+
+  // Use v3 proxy for AutoScaling
+  if (serviceKey === "AutoScaling") {
+    const v3Config = buildV3Config(params);
+    return createAutoScalingProxy(v3Config);
+  }
+
+  // Use v3 proxy for CloudWatch
+  if (serviceKey === "CloudWatch") {
+    const v3Config = buildV3Config(params);
+    return createCloudWatchProxy(v3Config);
+  }
+
+  // Use v3 proxy for EC2
+  if (serviceKey === "EC2") {
+    const v3Config = buildV3Config(params);
+    return createEC2Proxy(v3Config);
+  }
+
+  // Use v3 proxy for S3Control
+  if (serviceKey === "S3Control") {
+    const v3Config = buildV3Config(params);
+    return createS3ControlProxy(v3Config);
   }
 
   if (serviceKey.indexOf(".") > -1) {

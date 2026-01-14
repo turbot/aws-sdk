@@ -22,6 +22,10 @@
     "format": "npx prettier --write \"index.js\" \"lib/**/*.js\" \"test/**/*.js\""
   },
   "dependencies": {
+    "@aws-sdk/client-auto-scaling": "^3.969.0",
+    "@aws-sdk/client-cloudwatch": "^3.969.0",
+    "@aws-sdk/client-cloudwatch-logs": "^3.969.0",
+    "@aws-sdk/client-ec2": "^3.969.0",
     "@aws-sdk/client-ecs": "^3.968.0",
     "@aws-sdk/client-elasticache": "^3.968.0",
     "@aws-sdk/client-iam": "^3.968.0",
@@ -29,6 +33,7 @@
     "@aws-sdk/client-lambda": "^3.968.0",
     "@aws-sdk/client-rds": "^3.968.0",
     "@aws-sdk/client-s3": "3.968.0",
+    "@aws-sdk/client-s3-control": "^3.969.0",
     "@aws-sdk/client-ses": "^3.968.0",
     "@aws-sdk/client-sns": "^3.968.0",
     "@aws-sdk/client-sqs": "^3.968.0",
