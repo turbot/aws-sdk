@@ -11,10 +11,14 @@
   },
   "scripts": {
     "coverage": "npx nyc npm test",
-    "test": "npx mocha test/index.js test/s3-proxy.test.js test/s3-connect.test.js test/ssm-proxy.test.js test/ssm-connect.test.js",
+    "test": "npx mocha test/index.js test/s3-proxy.test.js test/s3-connect.test.js test/ssm-proxy.test.js test/ssm-connect.test.js test/sts-proxy.test.js test/sts-connect.test.js test/kms-proxy.test.js test/kms-connect.test.js test/sns-proxy.test.js test/sns-connect.test.js test/lambda-proxy.test.js test/lambda-connect.test.js",
     "test:integration": "npx mocha test/integration/**/*.test.js",
     "test:integration:s3": "npx mocha test/integration/s3.test.js test/integration/turbot-core-patterns.test.js",
     "test:integration:ssm": "npx mocha test/integration/ssm.test.js test/integration/turbot-core-ssm-patterns.test.js",
+    "test:integration:sts": "npx mocha test/integration/sts.test.js test/integration/turbot-core-sts-patterns.test.js",
+    "test:integration:kms": "npx mocha test/integration/kms.test.js test/integration/turbot-core-kms-patterns.test.js",
+    "test:integration:sns": "npx mocha test/integration/sns.test.js test/integration/turbot-core-sns-patterns.test.js",
+    "test:integration:lambda": "npx mocha test/integration/lambda.test.js test/integration/turbot-core-lambda-patterns.test.js",
     "format": "npx prettier --write \"index.js\" \"lib/**/*.js\" \"test/**/*.js\""
   },
   "dependencies": {
