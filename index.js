@@ -20,6 +20,9 @@ const micromatch = require("micromatch");
 const { URL } = require("url");
 const HttpsProxyAgent = require("https-proxy-agent");
 
+// v3 proxies for SDK migration
+const { createS3Proxy } = require("./lib/s3-proxy");
+
 // AWS SDK requires the use of proxy-agent. Unfortunately it's very limited
 // to the point where it doesn't support either environment variables and has
 // no way to configure no_proxy settings.
@@ -166,12 +169,57 @@ const connect = function (serviceKey, params, opts = {}) {
     };
   }
 
+  // Use v3 proxy for S3
+  if (serviceKey === "S3") {
+    const v3Config = buildS3V3Config(params);
+    return createS3Proxy(v3Config);
+  }
+
   if (serviceKey.indexOf(".") > -1) {
     const service = _.get(aws, serviceKey);
     return new service(params);
   }
 
   return new aws[serviceKey](params);
+};
+
+/**
+ * Convert v2-style S3 params to v3 config format.
+ * Extracted as a separate function for testability.
+ */
+const buildS3V3Config = function (params) {
+  const v3Config = {
+    region: params.region,
+  };
+
+  // Pass through credentials if provided
+  if (params.accessKeyId && params.secretAccessKey) {
+    v3Config.credentials = {
+      accessKeyId: params.accessKeyId,
+      secretAccessKey: params.secretAccessKey,
+      sessionToken: params.sessionToken,
+    };
+  }
+
+  // Configure custom endpoint if provided (for S3-compatible services)
+  if (params.endpoint) {
+    v3Config.endpoint = params.endpoint;
+    // forcePathStyle is needed for non-AWS S3-compatible services
+    if (params.s3ForcePathStyle) {
+      v3Config.forcePathStyle = params.s3ForcePathStyle;
+    }
+  }
+
+  // HTTP proxy support: if a proxy agent was configured by proxyAgent(),
+  // pass it to v3 via requestHandler. This enables corporate proxy routing.
+  if (params.httpOptions && params.httpOptions.agent) {
+    const { NodeHttpHandler } = require("@smithy/node-http-handler");
+    v3Config.requestHandler = new NodeHttpHandler({
+      httpsAgent: params.httpOptions.agent,
+    });
+  }
+
+  return v3Config;
 };
 
 const awsIamSignedRequest = (opts, service, credentials, callback) => {
@@ -296,6 +344,7 @@ const discoveryParams = (region) => {
 
 module.exports = {
   awsIamSignedRequest,
+  buildS3V3Config, // Exported for testing
   connect,
   customBackoff: customBackoffForDiscovery,
   discoveryParams,

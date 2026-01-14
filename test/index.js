@@ -34,7 +34,7 @@ describe("@turbot/aws-sdk", function () {
     var tmpEnv;
 
     before(function () {
-      tmpEnv = _.pick(process.env, "AWS_REGION", "TURBOT_CONFIG_ENV");
+      tmpEnv = _.pick(process.env, "AWS_DEFAULT_REGION", "TURBOT_CONFIG_ENV");
     });
 
     after(function () {
@@ -47,11 +47,11 @@ describe("@turbot/aws-sdk", function () {
       }
     });
 
-    describe("Defaults to AWS_REGION", function () {
+    describe("Defaults to AWS_DEFAULT_REGION", function () {
       var conn;
       const region = "ap-northeast-1";
       before(function () {
-        process.env.AWS_REGION = region;
+        process.env.AWS_DEFAULT_REGION = region;
         conn = taws.connect("SSM");
       });
       it("as expected", function () {
@@ -59,10 +59,11 @@ describe("@turbot/aws-sdk", function () {
       });
     });
 
-    describe("Prefers TURBOT_CONFIG.env.region over AWS_REGION", function () {
+    describe("Prefers TURBOT_CONFIG.env.region over AWS_DEFAULT_REGION", function () {
       var conn;
       const region = "ap-northeast-2";
       before(function () {
+        delete process.env.AWS_DEFAULT_REGION;
         process.env.TURBOT_CONFIG_ENV = JSON.stringify({ env: { region: region } });
         conn = taws.connect("SSM");
       });
@@ -89,7 +90,7 @@ describe("@turbot/aws-sdk", function () {
     var tmpEnv;
 
     before(function () {
-      tmpEnv = _.pick(process.env, "AWS_REGION", "TURBOT_CONFIG_ENV");
+      tmpEnv = _.pick(process.env, "AWS_DEFAULT_REGION", "TURBOT_CONFIG_ENV");
     });
 
     after(function () {

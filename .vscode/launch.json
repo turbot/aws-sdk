@@ -8,10 +8,66 @@
       "program": "${workspaceFolder}/index.js"
     },
     {
-      "name": "test",
+      "name": "Unit Tests",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha"
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": ["test/index.js", "test/s3-proxy.test.js", "test/s3-connect.test.js"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Integration Tests (All)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": ["test/integration/**/*.test.js", "--timeout", "30000"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "AWS_PROFILE": "silverwater"
+      }
+    },
+    {
+      "name": "Integration Tests (turbot-core patterns)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": ["test/integration/turbot-core-patterns.test.js", "--timeout", "30000"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "AWS_PROFILE": "silverwater"
+      }
+    },
+    {
+      "name": "Integration Tests (S3 Proxy)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": ["test/integration/s3.test.js", "--timeout", "30000"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "AWS_PROFILE": "silverwater"
+      }
+    },
+    {
+      "name": "Integration Tests (Current File)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": ["${file}", "--timeout", "30000"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "AWS_PROFILE": "silverwater"
+      }
     }
   ]
 }
