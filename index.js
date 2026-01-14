@@ -23,6 +23,10 @@ const HttpsProxyAgent = require("https-proxy-agent");
 // v3 proxies for SDK migration
 const { createS3Proxy } = require("./lib/s3-proxy");
 const { createSSMProxy } = require("./lib/ssm-proxy");
+const { createSTSProxy } = require("./lib/sts-proxy");
+const { createKMSProxy } = require("./lib/kms-proxy");
+const { createSNSProxy } = require("./lib/sns-proxy");
+const { createLambdaProxy } = require("./lib/lambda-proxy");
 
 // AWS SDK requires the use of proxy-agent. Unfortunately it's very limited
 // to the point where it doesn't support either environment variables and has
@@ -182,6 +186,30 @@ const connect = function (serviceKey, params, opts = {}) {
     return createSSMProxy(v3Config);
   }
 
+  // Use v3 proxy for STS
+  if (serviceKey === "STS") {
+    const v3Config = buildV3Config(params);
+    return createSTSProxy(v3Config);
+  }
+
+  // Use v3 proxy for KMS
+  if (serviceKey === "KMS") {
+    const v3Config = buildV3Config(params);
+    return createKMSProxy(v3Config);
+  }
+
+  // Use v3 proxy for SNS
+  if (serviceKey === "SNS") {
+    const v3Config = buildV3Config(params);
+    return createSNSProxy(v3Config);
+  }
+
+  // Use v3 proxy for Lambda
+  if (serviceKey === "Lambda") {
+    const v3Config = buildV3Config(params);
+    return createLambdaProxy(v3Config);
+  }
+
   if (serviceKey.indexOf(".") > -1) {
     const service = _.get(aws, serviceKey);
     return new service(params);
@@ -249,6 +277,35 @@ const buildSSMV3Config = function (params) {
 
   // HTTP proxy support: if a proxy agent was configured by proxyAgent(),
   // pass it to v3 via requestHandler. This enables corporate proxy routing.
+  if (params.httpOptions && params.httpOptions.agent) {
+    const { NodeHttpHandler } = require("@smithy/node-http-handler");
+    v3Config.requestHandler = new NodeHttpHandler({
+      httpsAgent: params.httpOptions.agent,
+    });
+  }
+
+  return v3Config;
+};
+
+/**
+ * Generic v2-to-v3 config converter for services without special requirements.
+ * Used by STS, KMS, SNS, Lambda.
+ */
+const buildV3Config = function (params) {
+  const v3Config = {
+    region: params.region,
+  };
+
+  // Pass through credentials if provided
+  if (params.accessKeyId && params.secretAccessKey) {
+    v3Config.credentials = {
+      accessKeyId: params.accessKeyId,
+      secretAccessKey: params.secretAccessKey,
+      sessionToken: params.sessionToken,
+    };
+  }
+
+  // HTTP proxy support
   if (params.httpOptions && params.httpOptions.agent) {
     const { NodeHttpHandler } = require("@smithy/node-http-handler");
     v3Config.requestHandler = new NodeHttpHandler({
@@ -383,6 +440,7 @@ module.exports = {
   awsIamSignedRequest,
   buildS3V3Config, // Exported for testing
   buildSSMV3Config, // Exported for testing
+  buildV3Config, // Exported for testing
   connect,
   customBackoff: customBackoffForDiscovery,
   discoveryParams,
