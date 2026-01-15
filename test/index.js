@@ -143,4 +143,29 @@ describe("@turbot/aws-sdk", function () {
       });
     });
   });
+
+  describe("getCredentials", function () {
+    it("exports getCredentials function", function () {
+      assert.isFunction(taws.getCredentials);
+    });
+
+    it("returns credentials from provider chain", function (done) {
+      // This test will use whatever credentials are available in the environment
+      // In CI/CD this might be from env vars, in local dev from ~/.aws/credentials
+      taws.getCredentials((err, credentials) => {
+        if (err) {
+          // If no credentials available, that's OK - just verify the function exists and errors correctly
+          assert.exists(err);
+          done();
+          return;
+        }
+        assert.exists(credentials.accessKeyId);
+        assert.exists(credentials.secretAccessKey);
+        // sessionToken and expiration may or may not exist depending on credential type
+        assert.property(credentials, "sessionToken");
+        assert.property(credentials, "expiration");
+        done();
+      });
+    });
+  });
 });

@@ -40,6 +40,37 @@ const { createCloudWatchProxy } = require("./lib/cloudwatch-proxy");
 const { createEC2Proxy } = require("./lib/ec2-proxy");
 const { createS3ControlProxy } = require("./lib/s3control-proxy");
 
+// v3 credential provider for getting current credentials
+const { fromNodeProviderChain } = require("@aws-sdk/credential-providers");
+
+/**
+ * Get current AWS credentials from the environment using SDK v3 credential provider chain.
+ * This resolves credentials from environment variables, ECS task role, IMDSv2, etc.
+ *
+ * @param {Function} callback - Callback with signature (err, credentials)
+ * @returns {void} - Calls callback with credentials object containing:
+ *   - accessKeyId: string
+ *   - secretAccessKey: string
+ *   - sessionToken: string (optional)
+ *   - expiration: Date (optional)
+ */
+const getCredentials = (callback) => {
+  const credentialProvider = fromNodeProviderChain();
+
+  credentialProvider()
+    .then((credentials) => {
+      callback(null, {
+        accessKeyId: credentials.accessKeyId,
+        secretAccessKey: credentials.secretAccessKey,
+        sessionToken: credentials.sessionToken || null,
+        expiration: credentials.expiration || null,
+      });
+    })
+    .catch((err) => {
+      callback(err);
+    });
+};
+
 // AWS SDK requires the use of proxy-agent. Unfortunately it's very limited
 // to the point where it doesn't support either environment variables and has
 // no way to configure no_proxy settings.
@@ -553,6 +584,7 @@ module.exports = {
   connect,
   customBackoff: customBackoffForDiscovery,
   discoveryParams,
+  getCredentials,
 };
 
 // const initialize = function() {
